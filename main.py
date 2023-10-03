@@ -23,7 +23,6 @@ TELEGRAM_BOT_API = "https://api.telegram.org/bot"
 TELEGRAM_BOT_API_SEND_MESSAGE_METHOD = "/sendMessage?"
 
 SCHEDULED_TASK_DELAY = 60  # Sec
-SCHEDULED_TASK_SYNCHRONIZATION_INTERVAL = 1  # Day
 
 logger = logging.getLogger('main_logging')
 
@@ -50,22 +49,24 @@ def get_bandwidth():
     """
 
     """
-    bandwidth_json = requests.get(VULTR_URL, headers={'Authorization': 'Bearer %s' % VULTR_API_KEY}).json()
+    response = requests.get(VULTR_URL, headers={'Authorization': 'Bearer %s' % VULTR_API_KEY})
 
     incoming_bytes = 0
     outgoing_bytes = 0
     days = 0
-    bandwidth_dates = bandwidth_json['bandwidth']
 
-    today = date.today()
-    day = today.strftime("%Y-%m-%d")
+    if response.status_code == 200:
+        bandwidth_json = response.json()
+        bandwidth_dates = bandwidth_json['bandwidth']
 
-    for key,value in bandwidth_dates.items():
-        if key[0:8] == day[0:8]:
-            print(key)
-            incoming_bytes = incoming_bytes + (value.get("incoming_bytes"))/(1024 * 1024 * 1024)
-            outgoing_bytes = outgoing_bytes + (value.get("outgoing_bytes"))/(1024 * 1024 * 1024)
-            days += 1
+        today = date.today()
+        day = today.strftime("%Y-%m-%d")
+
+        for key,value in bandwidth_dates.items():
+            if key[0:8] == day[0:8]:
+                incoming_bytes = incoming_bytes + (value.get("incoming_bytes"))/(1024 * 1024 * 1024)
+                outgoing_bytes = outgoing_bytes + (value.get("outgoing_bytes"))/(1024 * 1024 * 1024)
+                days += 1
 
     str = 'Days: {0:d} In: {1:.2f} Out: {2:.2f}'.format(days, round(incoming_bytes, 2), round(outgoing_bytes, 2))
     logger.info('{0:s} {1:s}'.format("get_bandwidth:", str))
@@ -90,7 +91,7 @@ def scheduled_task():
     """
     Scheduled task
     """
-    schedule.every(SCHEDULED_TASK_SYNCHRONIZATION_INTERVAL).days.do(update_info)
+    schedule.every().day.at('06:00').do(update_info)
     logger.info("scheduled_task: Start")
     while True:
         logger.info("scheduled_task: while")
