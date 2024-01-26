@@ -3,11 +3,11 @@ version: "3.3"
 services:
   vultr:
     build:
-      context: /home/rom/apps/vultr/
-    container_name: vultr
+      context: /home/rom/apps/vultrapi/
+    container_name: vultrapi
     restart: always
     user: 1000:985
     volumes:
-      - /home/rom/apps/vultr/:/home/vultr/vultr/vultr
+      - /home/rom/apps/vultrapi/:/home/vultr/vultr/vultr
     command: sh -c "/home/vultr/pyvenv/bin/python3 /home/vultr/vultr/vultr/main.py"
 
