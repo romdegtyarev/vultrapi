@@ -17,6 +17,7 @@ INSTANCE_ID = config.INSTANCE_ID
 VULTR_API_KEY = config.VULTR_API_KEY
 TOKEN = config.TOKEN
 GROUP_CHAT_ID = config.CHAT_ID
+VPSFLAG = config.VPSFLAG
 
 VULTR_URL = "https://api.vultr.com/v2/instances/"+INSTANCE_ID+"/bandwidth"
 TELEGRAM_BOT_API = "https://api.telegram.org/bot"
@@ -81,7 +82,7 @@ def update_info():
 
     """
     str = get_bandwidth()
-    send_2_telegram(GROUP_CHAT_ID, str)
+    send_2_telegram(GROUP_CHAT_ID, f'{VPSFLAG}: {str}')
 
 ################################################################################
 # name:        scheduled_task
